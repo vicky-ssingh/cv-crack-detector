@@ -1,0 +1,5 @@
+frame_id,source_name,class_name,confidence,timestamp,x1,y1,x2,y2
+0,sample_metal_plate.jpg,scratch,0.87,2024-01-15 10:23:41,45,102,310,145
+0,sample_metal_plate.jpg,crack,0.73,2024-01-15 10:23:41,200,300,410,355
+1,sample_pcb.jpg,missing_part,0.91,2024-01-15 10:24:05,80,60,165,130
+1,sample_pcb.jpg,dent,0.65,2024-01-15 10:24:05,340,210,445,290

@@ -1,0 +1,21 @@
+# Virtual Environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Model files (optional if large)
+*.pt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+
+# Ignore dataset
+data/
+
+# Ignore reports (optional)
+reports/
+
