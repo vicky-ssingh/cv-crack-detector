@@ -78,19 +78,27 @@ def get_valid_model_path():
     return None
 
 
+import requests
+
+MODEL_URL = "https://drive.google.com/uc?id=1N3g2k1q_VLSCZXNbOWSrYkStGn9_7xR1"
+MODEL_PATH = "best.pt"
+
 @st.cache_resource
 def load_model() -> YOLO:
-    """
-    Load YOLO model safely (no crash even if path is wrong).
-    """
-    model_path = get_valid_model_path()
+    # Step 1: Download model if not exists
+    if not os.path.exists(MODEL_PATH):
+        st.info("⬇️ Downloading trained model from cloud...")
+        response = requests.get(MODEL_URL)
+        with open(MODEL_PATH, "wb") as f:
+            f.write(response.content)
 
-    if model_path:
-        st.success(f"✅ Model loaded from: {model_path}")
-        return YOLO(model_path)
+    # Step 2: Load model
+    if os.path.exists(MODEL_PATH):
+        st.success("✅ Custom trained model loaded")
+        return YOLO(MODEL_PATH)
 
-    # Fallback (never crash)
-    st.warning("⚠️ No trained model found. Using default YOLOv8n.")
+    # Fallback (just in case)
+    st.warning("⚠️ Failed to load custom model. Using default YOLOv8n.")
     return YOLO("yolov8n.pt")
 
 
