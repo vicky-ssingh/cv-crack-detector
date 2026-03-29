@@ -16,6 +16,7 @@ import numpy as np              # Numerical operations on image arrays
 import pandas as pd             # For building the CSV report table
 import os                       # For file path operations
 import tempfile                 # For saving uploaded video to a temp file
+from glob import glob
 from PIL import Image           # Pillow: converts between image formats
 from datetime import datetime   # For timestamping detections
 from ultralytics import YOLO    # The YOLOv8 detection framework
@@ -31,12 +32,24 @@ from ultralytics import YOLO
 # Base directory of project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Possible model locations (priority order)
-MODEL_CANDIDATES = [
-    os.path.join(BASE_DIR, "models", "best.pt"),  # ✅ your trained model (recommended)
-    os.path.join(BASE_DIR, "runs", "detect", "train", "weights", "best.pt"),  # training output
-    os.path.join(BASE_DIR, "notebooks", "yolov8n.pt"),  # fallback model
-]
+def get_model_candidates():
+    """Return likely model paths in priority order."""
+    candidates = [
+        os.path.join(BASE_DIR, "models", "best.pt"),
+        os.path.join(BASE_DIR, "models", "yolov8n_defects.pt"),
+    ]
+
+    run_candidates = sorted(
+        glob(os.path.join(BASE_DIR, "runs", "detect", "*", "weights", "best.pt")),
+        key=os.path.getmtime,
+        reverse=True,
+    )
+    candidates.extend(run_candidates)
+    candidates.extend([
+        os.path.join(BASE_DIR, "yolov8n.pt"),
+        os.path.join(BASE_DIR, "notebooks", "yolov8n.pt"),
+    ])
+    return candidates
 
 # Class names must match the order used during training
 CLASS_NAMES = ["scratch", "dent", "crack", "missing_part"]
@@ -59,7 +72,7 @@ CONFIDENCE_THRESHOLD = 0.10
 
 def get_valid_model_path():
     """Find first valid model file."""
-    for path in MODEL_CANDIDATES:
+    for path in get_model_candidates():
         if os.path.isfile(path):   # ✅ ensures it's a FILE (not folder)
             return path
     return None
